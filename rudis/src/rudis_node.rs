@@ -1,16 +1,16 @@
-use std::collections::HashMap;
-use std::iter;
-use rand::{Rng, thread_rng};
 use rand::distributions::Alphanumeric;
-use std::net::{SocketAddr, TcpListener, TcpStream};
+use rand::{thread_rng, Rng};
+use std::collections::HashMap;
 use std::io::prelude::*;
+use std::iter;
+use std::net::{SocketAddr, TcpListener, TcpStream};
 type NodeID = String;
 
 #[derive(Debug)]
 enum NodeType {
     Primary,
     Replicas,
-    Solo, 
+    Solo,
 }
 
 #[derive(Debug)]
@@ -45,18 +45,22 @@ impl RudisNode {
     pub fn listen(&self) {
         for stream in self.tcp_listener.incoming() {
             let stream = stream.unwrap();
-            self.process_request(stream) 
+            let mut buffer = [0; 512];
+            self.parse_request(stream, &mut buffer);
+            println!("Request: {}", String::from_utf8_lossy(&buffer[..]));
+            // parse buffer here
         }
     }
 
-    fn process_request(&self, mut stream: TcpStream) {
-        let mut buffer = [0;512];
-        stream.read(&mut buffer).unwrap();
-        println!("Request: {}", String::from_utf8_lossy(&buffer[..]));
+    fn parse_request(&self, mut stream: TcpStream, buffer: &mut [u8]) {
+        stream.read(buffer).unwrap();
     }
 
     fn set_node_id(&mut self) {
         let mut rng = thread_rng();
-        self.id = iter::repeat(()).map(|()| rng.sample(Alphanumeric)).take(32).collect();
+        self.id = iter::repeat(())
+            .map(|()| rng.sample(Alphanumeric))
+            .take(32)
+            .collect();
     }
 }
