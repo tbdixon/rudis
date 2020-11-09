@@ -1,7 +1,10 @@
 use rudis::rudis_node::RudisNode;
+use std::net::TcpListener;
+use std::env;
 
 fn main() {
-    let ips = vec!["127.0.0.1:8080", "127.0.0.1:8081", "127.0.0.1:8082", "127.0.0.1:8083", "127.0.0.1:8084", "127.0.0.1:8085"];
-    let node = RudisNode::new(ips[0].to_string());
-    println!("{:?}", node);
+    let args: Vec<String> = env::args().collect();
+    let node = RudisNode::new(args);
+    println!("Created a new node with address {} and ID {}. Listening for commands", node.socket_addr, node.id);
+    node.listen(); 
 }
