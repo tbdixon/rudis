@@ -1,2 +1,2 @@
 # rudis
-A rusty, bare-bones distributed key-value store with similar ideas as redis
+A rusty dictionary server; bare-bones inspired by Redis 
