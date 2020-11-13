@@ -1,4 +1,5 @@
 use std::sync::mpsc::Receiver;
+use std::thread;
 
 #[derive(Debug)]
 enum NodeType {
@@ -9,17 +10,13 @@ enum NodeType {
 #[derive(Debug)]
 pub struct RudisNode {
     node_type: NodeType,
-    client_rx: Receiver<String>,
-    server_rx: Receiver<String>,
     replicas: Vec<String>,
 }
 
 impl RudisNode {
-    pub fn new(client_rx: Receiver<String>, server_rx: Receiver<String>) -> RudisNode {
+    pub fn new() -> RudisNode {
         RudisNode {
             node_type: NodeType::Primary,
-            client_rx,
-            server_rx,
             replicas: Vec::new(),
         }
     }
@@ -28,10 +25,21 @@ impl RudisNode {
         self.node_type = NodeType::Replica;
     }
 
-    pub fn process(self) {
-        for msg in self.client_rx {
-            println!("Message received: {}", msg);
-        }
+    pub fn process(
+        &self,
+        client_rx: Receiver<String>,
+        server_rx: Receiver<String>,
+    ) -> (thread::JoinHandle<()>, thread::JoinHandle<()>) {
+        let ct = thread::spawn(|| {
+            for msg in client_rx {
+                println!("Client message received: {}", msg);
+            }
+        });
+        let st = thread::spawn(|| {
+            for msg in server_rx {
+                println!("Server message received: {}", msg);
+            }
+        });
+        (ct, st)
     }
 }
-
