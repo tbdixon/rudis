@@ -9,8 +9,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let (client_tx, client_rx) = channel();
     let (server_tx, server_rx) = channel();
     let node = RudisNode::new(client_rx, server_rx);
-    let server = RudisServer::new(args, client_tx, server_tx)?;
+    let server = RudisServer::new(args)?;
     println!("Node and server created");
-    server.listen()?;
+    server.listen(client_tx, server_tx)?;
+    node.process();
     Ok(())
 }

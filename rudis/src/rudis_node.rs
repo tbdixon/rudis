@@ -27,5 +27,11 @@ impl RudisNode {
     pub fn make_replica(&mut self) {
         self.node_type = NodeType::Replica;
     }
+
+    pub fn process(self) {
+        for msg in self.client_rx {
+            println!("Message received: {}", msg);
+        }
+    }
 }
 
