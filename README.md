@@ -1,2 +1,2 @@
 # rudis
-A rusty dictionary server; bare-bones inspired by Redis 
+A bare-bones rusty dictionary server as an exercise in learning Rust.
