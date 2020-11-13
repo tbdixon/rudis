@@ -1,14 +1,16 @@
 use rudis::rudis_node::RudisNode;
+use rudis::server::RudisServer;
 use std::env;
 use std::error::Error;
+use std::sync::mpsc::channel;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
-    let node = RudisNode::new(args)?;
-    println!(
-        "Created a new node with address {} and ID {}. Listening for commands",
-        node.client_socket_addr, node.id
-    );
-    node.listen();
+    let (client_tx, client_rx) = channel();
+    let (server_tx, server_rx) = channel();
+    let node = RudisNode::new(client_rx, server_rx);
+    let server = RudisServer::new(args, client_tx, server_tx)?;
+    println!("Node and server created");
+    server.listen()?;
     Ok(())
 }
