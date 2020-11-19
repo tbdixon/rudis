@@ -3,12 +3,12 @@ use std::sync::{Arc, Mutex};
 
 #[derive(Clone)]
 pub struct RudisDb {
-    db: Arc<Mutex<HashMap<String, i32>>>,
+    pub db: Arc<Mutex<HashMap<String, i64>>>,
 }
 
 impl RudisDb {
     pub fn new() -> RudisDb {
-        let map: HashMap<String, i32> = HashMap::new();
+        let map: HashMap<String, i64> = HashMap::new();
         RudisDb {
             db: Arc::new(Mutex::new(map)),
         }
