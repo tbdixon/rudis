@@ -1,16 +1,29 @@
 use crate::db::RudisDb;
+use crate::data_frame::{self, DataFrameBuffer};
 use std::error::Error;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 use std::thread;
 
-pub fn handle_connection(mut stream: TcpStream, db: RudisDb) {
-    let mut buffer = String::new();
-    stream.read_to_string(&mut buffer).unwrap();
-    match &buffer[0..4] {
-        "PUT " => db.put(buffer),
-        "GET " => db.get(buffer),
-        _ => println!("UNKNOWN COMMAND!"),
+pub fn handle_connection(mut stream: TcpStream, _: RudisDb) {
+    let mut buffer = [0; data_frame::MAX_FRAME_SIZE];
+    loop {
+        match stream.read(&mut buffer) {
+            Ok(num_bytes) => {
+                if num_bytes > 0 {
+                    let data_frame = data_frame::dataframe_from_bytes(&mut DataFrameBuffer::new(buffer));
+                    println!("Dataframe received: {:?}", data_frame);
+                }
+                else{
+                    println!("Connection closed");
+                    break;
+                }
+            },
+            Err(err) => {
+                println!("Error with remote command: {:?}", err);
+                break;
+            }
+        }
     }
 }
 

@@ -2,8 +2,8 @@ use crate::Result;
 use std::error::Error;
 use std::fmt;
 
+pub const MAX_FRAME_SIZE: usize = 1024;
 const TERMINATOR: [u8; 2] = [b'\r', b'\n'];
-const MAX_FRAME_SIZE: usize = 1024;
 
 #[macro_export]
 macro_rules! respbuff {
